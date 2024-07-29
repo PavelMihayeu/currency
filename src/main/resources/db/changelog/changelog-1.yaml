@@ -1,0 +1,92 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0
+      author: PavelMihayeu
+      changes:
+        - sql:
+            splitStatements: false
+            stripComments: true
+            sql: CREATE SCHEMA IF NOT EXISTS currencyapi;
+
+  - changeSet:
+      id: 1
+      author: PavelMihayeu
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: currency
+              schemaName: currencyapi
+      changes:
+        - createTable:
+            schemaName: currencyapi
+            tableName: currency
+            columns:
+              - column:
+                  name: code
+                  type: varchar(10)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: symbol
+                  type: varchar(10)
+              - column:
+                  name: name
+                  type: varchar(255)
+              - column:
+                  name: symbol_native
+                  type: varchar(10)
+              - column:
+                  name: decimal_digits
+                  type: int
+              - column:
+                  name: rounding
+                  type: int
+              - column:
+                  name: name_plural
+                  type: varchar(255)
+              - column:
+                  name: type
+                  type: varchar(255)
+              - column:
+                  name: last_updated_at
+                  type: timestamp
+  - changeSet:
+      id: 2
+      author: PavelMihayeu
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: currency_rate
+              schemaName: currencyapi
+      changes:
+        - createTable:
+            schemaName: currencyapi
+            tableName: currency_rate
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: currency_code
+                  type: varchar(10)
+              - column:
+                  name: code
+                  type: varchar(10)
+              - column:
+                  name: value
+                  type: decimal(19,4)
+        - addForeignKeyConstraint:
+            baseTableName: currency_rate
+            baseColumnNames: currency_code
+            constraintName: fk_currency_rate_currency
+            baseTableSchemaName: currencyapi
+            referencedTableName: currency
+            referencedColumnNames: code
+            referencedTableSchemaName: currencyapi
